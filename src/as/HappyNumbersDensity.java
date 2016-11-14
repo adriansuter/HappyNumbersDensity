@@ -8,10 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -137,6 +135,7 @@ public class HappyNumbersDensity {
                 int mapNumber = numberHistogram.h();
                 String mapSignature = NumberHistogramFactory.fromInteger(mapNumber).toString();
                 if (happyNumbersCollection.isHappy(mapSignature)) {
+                    System.out.println(i + "\t" + numberHistogram.toString() + "\t" + numberHistogram.numberCount());
                     happyNumbersCollection.addHappy(numberHistogram.toString(), numberHistogram.numberCount());
                 }
             }
