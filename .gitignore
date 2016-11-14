@@ -13,3 +13,6 @@ hs_err_pid*
 /HappyNumbersDensity/nbproject/private/
 /build/
 /nbproject/private/
+/happySignatures_*
+/signatures_*
+/happyStats*

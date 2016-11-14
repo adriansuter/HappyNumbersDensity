@@ -1,9 +1,11 @@
 package as;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -121,26 +123,65 @@ public class HappyNumbersDensity {
          * http://math.stackexchange.com/questions/159210/non-decreasing-digits
          */
 
-        HappyNumbersCollection happyNumbersCollection = new HappyNumbersCollection();
-        happyNumbersCollection.init();
+        try {
+            File statsFile = new File("happyStats.txt");
+            if (!statsFile.exists()) {
+                statsFile.createNewFile();
+            }
+            FileWriter statsFileWriter = new FileWriter(statsFile);
+            BufferedWriter statsBufferedWriter = new BufferedWriter(statsFileWriter);
 
-        System.out.println(happyNumbersCollection.getCount() + " -- " + happyNumbersCollection.getSignaturesCount());
+            HappyNumbersCollection happyNumbersCollection = new HappyNumbersCollection();
+            happyNumbersCollection.init();
 
-        for (int i = 4; i < 50; i++) {
-            NumberHistogram numberHistogram = new NumberHistogram(i - 1, 1, 0, 0, 0, 0, 0, 0, 0, 0);
-            happyNumbersCollection.addHappy(numberHistogram.toString(), numberHistogram.numberCount());
-            while (numberHistogram.hasNext()) {
-                numberHistogram.next();
+            statsBufferedWriter.write(happyNumbersCollection.getCount() + " -- " + happyNumbersCollection.getSignaturesCount() + "\n");
+            System.out.println(happyNumbersCollection.getCount() + " -- " + happyNumbersCollection.getSignaturesCount());
 
-                int mapNumber = numberHistogram.h();
-                String mapSignature = NumberHistogramFactory.fromInteger(mapNumber).toString();
-                if (happyNumbersCollection.isHappy(mapSignature)) {
-                    System.out.println(i + "\t" + numberHistogram.toString() + "\t" + numberHistogram.numberCount());
-                    happyNumbersCollection.addHappy(numberHistogram.toString(), numberHistogram.numberCount());
+            for (int i = 4; i < 15; i++) {
+                File signaturesFile = new File("signatures_" + i + ".txt");
+                if (!signaturesFile.exists()) {
+                    signaturesFile.createNewFile();
                 }
+                FileWriter signaturesFileWriter = new FileWriter(signaturesFile);
+                BufferedWriter signaturesBufferedWriter = new BufferedWriter(signaturesFileWriter);
+
+                /*
+                File happySignaturesFile = new File("happySignatures_" + i + ".txt");
+                if (!happySignaturesFile.exists()) {
+                    happySignaturesFile.createNewFile();
+                }
+                FileWriter happySignaturesFileWriter = new FileWriter(happySignaturesFile);
+                BufferedWriter happySignaturesBufferedWriter = new BufferedWriter(happySignaturesFileWriter);
+                 */
+                NumberHistogram numberHistogram = new NumberHistogram(i - 1, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+                happyNumbersCollection.addHappy(numberHistogram, numberHistogram.numberCount());
+                signaturesBufferedWriter.write(numberHistogram.toString() + "\t" + ":)\n");
+                while (numberHistogram.hasNext()) {
+                    numberHistogram.next();
+
+                    int mapNumber = numberHistogram.h();
+                    if (happyNumbersCollection.isHappy(NumberHistogramFactory.fromInteger(mapNumber))) {
+                        //      happySignaturesBufferedWriter.write(i + "\t" + numberHistogram.toString() + "\t" + numberHistogram.numberCount() + "\n");
+                        happyNumbersCollection.addHappy(numberHistogram, numberHistogram.numberCount());
+                        signaturesBufferedWriter.write(numberHistogram.toString() + "\t:)\n");
+                    } else {
+                        signaturesBufferedWriter.write(numberHistogram.toString() + "\t\n");
+                    }
+                }
+                //happySignaturesBufferedWriter.flush();
+                //happySignaturesBufferedWriter.close();
+                signaturesBufferedWriter.flush();
+                signaturesBufferedWriter.close();
+
+                statsBufferedWriter.write(happyNumbersCollection.getCount() + " -- " + happyNumbersCollection.getSignaturesCount() + "\n");
+                statsBufferedWriter.flush();
+                System.out.println(i + ": " + happyNumbersCollection.getCount() + " -- " + happyNumbersCollection.getSignaturesCount());
             }
 
-            System.out.println(i + ": " + happyNumbersCollection.getCount() + " -- " + happyNumbersCollection.getSignaturesCount());
+            statsBufferedWriter.flush();
+            statsBufferedWriter.close();
+        } catch (IOException ex) {
+
         }
 
         System.exit(0);
