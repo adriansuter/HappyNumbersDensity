@@ -4,13 +4,18 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-public class A10 {
+public final class NumberHistogram {
 
     private final int[] _amount;
     private int _size = 0;
 
-    public A10() {
-        this._amount = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    public NumberHistogram() {
+        this(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+
+    public NumberHistogram(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9) {
+        _amount = new int[]{a0, a1, a2, a3, a4, a5, a6, a7, a8, a9};
+        updateSize();
     }
 
     private BigInteger _factorial(int nr) {
@@ -28,14 +33,14 @@ public class A10 {
 
         for (int i = 0; i < 10; i++) {
             if (_amount[i] > 1) {
-                count = count.divide(new BigDecimal(_factorial(_amount[i])));
+                count = count.divide(new BigDecimal(_factorial(_amount[i])), MathContext.DECIMAL32);
             }
         }
 
         // Remove all possible numbers that would start by a zero.
         if (_amount[0] > 0) {
             double t = (1.0 - (double) _amount[0] / (double) _size);
-            count = count.multiply(new BigDecimal(t));
+            count = count.multiply(new BigDecimal(t), MathContext.DECIMAL32);
         }
 
         return count.round(MathContext.DECIMAL32).toBigInteger();

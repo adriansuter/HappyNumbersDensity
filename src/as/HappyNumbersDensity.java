@@ -16,13 +16,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-
 public class HappyNumbersDensity {
 
     public static void checkSection(int nr, TreeMap<Integer, String> uniques) {
         BigInteger numbersCount = new BigInteger("0");
 
-        A10 a = A10Converter.convert(nr);
+        NumberHistogram a = NumberHistogramFactory.fromInteger(nr);
 
         String lastLine = "";
         Iterator<Map.Entry<Integer, String>> uniqueIterator = uniques.entrySet().iterator();
@@ -54,7 +53,7 @@ public class HappyNumbersDensity {
             Calendar calendar = new GregorianCalendar();
             calendar.add(Calendar.SECOND, reportSeconds);
             for (int k = nrStart; k < nrStop; k++) {
-                String a10 = A10Converter.convert(k).toString();
+                String a10 = NumberHistogramFactory.fromInteger(k).toString();
                 if (!uniques.containsValue(a10)) {
                     uniques.put(k, a10);
                 }
@@ -97,7 +96,7 @@ public class HappyNumbersDensity {
         return null;
     }
 
-    public static int combinatorics(int n, int k) {
+    public static int combinations(int n, int k) {
         double g = 1.0;
 
         for (double i = k; i > 0; i--) {
@@ -112,7 +111,7 @@ public class HappyNumbersDensity {
 
         System.out.println("n: " + n);
         for (int i = 1; i < 10; i++) {
-            sum += combinatorics(10 - i + (n - 1), n - 1);
+            sum += combinations(10 - i + (n - 1), n - 1);
         }
 
         return sum;
@@ -124,6 +123,28 @@ public class HappyNumbersDensity {
          * http://math.stackexchange.com/questions/159210/non-decreasing-digits
          */
 
+        HappyNumbersCollection happyNumbersCollection = new HappyNumbersCollection();
+        happyNumbersCollection.init();
+
+        System.out.println(happyNumbersCollection.getCount() + " -- " + happyNumbersCollection.getSignaturesCount());
+
+        for (int i = 4; i < 50; i++) {
+            NumberHistogram numberHistogram = new NumberHistogram(i - 1, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+            happyNumbersCollection.addHappy(numberHistogram.toString(), numberHistogram.numberCount());
+            while (numberHistogram.hasNext()) {
+                numberHistogram.next();
+
+                int mapNumber = numberHistogram.h();
+                String mapSignature = NumberHistogramFactory.fromInteger(mapNumber).toString();
+                if (happyNumbersCollection.isHappy(mapSignature)) {
+                    happyNumbersCollection.addHappy(numberHistogram.toString(), numberHistogram.numberCount());
+                }
+            }
+
+            System.out.println(i + ": " + happyNumbersCollection.getCount() + " -- " + happyNumbersCollection.getSignaturesCount());
+        }
+
+        System.exit(0);
 
         /*
         saveUniques(4);
@@ -166,7 +187,7 @@ public class HappyNumbersDensity {
             int count = 1;
             BigInteger numbersCount = new BigInteger("0");
 
-            A10 a = A10Converter.convert(da);
+            NumberHistogram a = NumberHistogramFactory.fromHistogramArray(da);
             // System.out.println(a.toString() + " => " + a.numberCount());
             numbersCount = numbersCount.add(a.numberCount());
 
@@ -182,84 +203,6 @@ public class HappyNumbersDensity {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        
-
-
-
-        System.exit(0);
-
-        ArrayList<Integer> positions = new ArrayList<>();
-
-        int[] happyNumbers = {1, 7, 10, 13, 19, 23, 28, 31, 32, 44, 49, 68, 70, 79, 82, 86, 91, 94, 97, 100, 103, 109, 129, 130, 133, 139, 167, 176, 188, 190, 192, 193, 203, 208, 219, 226, 230, 236, 239, 262, 263, 280, 291, 293, 301, 302, 310, 313, 319, 320, 326, 329, 331, 338, 356, 362, 365, 367, 368, 376, 379, 383, 386, 391, 392, 397, 404, 409, 440, 446, 464, 469, 478, 487, 490, 496, 536, 556, 563, 565, 566, 608, 617, 622, 623, 632, 635, 637, 638, 644, 649, 653, 655, 656, 665, 671, 673, 680, 683, 694, 700, 709, 716, 736, 739, 748, 761, 763, 784, 790, 793, 802, 806, 818, 820, 833, 836, 847, 860, 863, 874, 881, 888, 899, 901, 904, 907, 910, 912, 913, 921, 923, 931, 932, 937, 940, 946, 964, 970, 973, 989, 998};
-        ArrayList<String> a10HappyNumbers = new ArrayList<>();
-        for (int happyNumber : happyNumbers) {
-            String a10 = A10Converter.convert(happyNumber).toString();
-            if (!a10HappyNumbers.contains(a10)) {
-                a10HappyNumbers.add(a10);
-            }
-        }
-
-        positions.add(0);
-
-        HashMap<Integer, Integer> happyCount = new HashMap<>();
-
-        int idx = 0;
-        int i = 0;
-        while (i < 0) {
-            A10 a10 = A10Converter.convert(positions);
-            String a10String = a10.toString();
-            if (a10HappyNumbers.contains(a10String)) {
-                //System.out.println(getPositionsString(positions) + " => " + a10.toString() + " :)");
-                happyCount.put(a10.getSize(), happyCount.getOrDefault(a10.getSize(), 0) + 1);
-            } else {
-                A10 a10H = A10Converter.convert(a10.h());
-                if (a10HappyNumbers.contains(a10H.toString())) {
-                    a10HappyNumbers.add(a10String);
-                    //System.out.println(getPositionsString(positions) + " => " + a10.toString() + " ->:)");
-                    happyCount.put(a10.getSize(), happyCount.getOrDefault(a10.getSize(), 0) + 1);
-                }
-            }
-
-            positions.set(idx, positions.get(idx) + 1);
-            if (positions.get(idx) == 10) {
-                positions.set(idx, 0);
-                if (idx > 0) {
-                    int b = 1;
-                    while (idx - b >= 0 && positions.get(idx - b) < 10) {
-                        if (positions.get(idx - b) == 9) {
-                            positions.set(idx - b, 0);
-                            if (idx - b == 0) {
-                                positions.set(idx - b, 1);
-                                positions.add(0);
-                                idx++;
-                                break;
-                            }
-                            b++;
-                        } else {
-                            positions.set(idx - b, positions.get(idx - b) + 1);
-                            break;
-                        }
-                    }
-                } else {
-                    positions.set(0, 1);
-                    positions.add(0);
-                    idx++;
-                }
-            }
-
-            i++;
-        }
-
-        Iterator<Map.Entry<Integer, Integer>> iterator = happyCount.entrySet().iterator();
-        int sum = 0;
-        while (iterator.hasNext()) {
-            Map.Entry<Integer, Integer> entry = iterator.next();
-            sum += entry.getValue();
-            System.out.println("Numbers of digits up to length " + entry.getKey() + " contain " + sum + " happy numbers");
-
-        }
     }
 
-    
 }

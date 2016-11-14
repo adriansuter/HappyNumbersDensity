@@ -2,10 +2,10 @@ package as;
 
 import java.util.ArrayList;
 
-public class A10Converter {
+public class NumberHistogramFactory {
 
-    public static A10 convert(int nr) {
-        A10 a10 = new A10();
+    public static NumberHistogram fromInteger(int nr) {
+        NumberHistogram a10 = new NumberHistogram();
 
         String nrString = Integer.toString(nr);
         for (int i = 0; i < nrString.length(); i++) {
@@ -15,12 +15,12 @@ public class A10Converter {
         return a10;
     }
 
-    public static A10 convert(int[] digitAmounts) throws Exception {
+    public static NumberHistogram fromHistogramArray(int[] digitAmounts) throws Exception {
         if (digitAmounts.length != 10) {
             throw new Exception("Not enough digits defined.");
         }
 
-        A10 a10 = new A10();
+        NumberHistogram a10 = new NumberHistogram();
         for (int i = 0; i < 10; i++) {
             a10.setDigitAmount(i, digitAmounts[i]);
         }
@@ -29,8 +29,8 @@ public class A10Converter {
         return a10;
     }
 
-    public static A10 convert(ArrayList<Integer> positions) {
-        A10 a10 = new A10();
+    public static NumberHistogram fromDigits(ArrayList<Integer> positions) {
+        NumberHistogram a10 = new NumberHistogram();
 
         positions.stream().forEach((position) -> {
             a10.addDigit(position);
